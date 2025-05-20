@@ -1,9 +1,9 @@
-# CPPProject
-# Dự án ví điểm thưởng
+## CPPProject
+## Dự án ví điểm thưởng
 
-Thành viên tạo dự án: Phan Lâm Hải - K24DTCN053
+#Thành viên tạo dự án: Phan Lâm Hải - K24DTCN053
 
-Mô tả chung về dự án:
+#Mô tả chung về dự án:
   *Người dùng (User) có thể tạo tài khoản ví điểm và thực hiện các thao tác mua bán trao đổi điểm giữa các ví
   
   *Quản lý (Admin) sẽ có các chức năng như hỗ trợ thay đổi thông tin người dùng, nạp thêm/trừ bớt điểm ở ví người dùng, quản lý thông tin nhóm người dùng
@@ -12,7 +12,7 @@ Mô tả chung về dự án:
 
 Mô tả chi tiết các chức năng trong chương trình:
 
-Chức năng chính
+#Chức năng chính
 1. Quản lý người dùng
 -Đăng ký người dùng mới, có tùy chọn tạo mật khẩu tạm.
 
@@ -44,7 +44,7 @@ Chức năng chính
 
 -OTP và mật khẩu tạm giúp tăng tính bảo mật cho những thao tác quan trọng.
 
-Cấu trúc dữ liệu và lưu trữ
+#Cấu trúc dữ liệu và lưu trữ
 -Dữ liệu người dùng được lưu trong:
 
 users.txt (danh sách tổng hợp)
