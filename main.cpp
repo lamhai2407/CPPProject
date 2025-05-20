@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// Utility function to hash password (simple hashing alternative)
+// Hàm băm để lưu mật khẩu an toàn
 string simpleHash(const string& password) {
     unsigned long hash = 5381;
     for (char c : password) {
@@ -16,6 +16,7 @@ string simpleHash(const string& password) {
     }
     return to_string(hash);
 }
+// Hàm sinh OTP
 string generateOTP(int length = 6) {
     const string digits = "0123456789";
     string otp = "";
@@ -25,7 +26,7 @@ string generateOTP(int length = 6) {
     }
     return otp;
 }
-// Utility function to generate a random password
+// Hàm khởi tạo mật khẩu ngẫu nhiên
 string generateRandomPassword(int length = 8) {
     const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     string password = "";
@@ -36,7 +37,7 @@ string generateRandomPassword(int length = 8) {
     return password;
 }
 
-// User Account Structure
+// Cấu trúc của User Account để lưu thông tin người dùng
 struct User {
     string username;
     string passwordHash;
@@ -46,7 +47,7 @@ struct User {
 
 unordered_map<string, User> userDatabase;
 unordered_map<string, string> adminDatabase;
-// Function to save individual user information to a file
+// Lưu thông tin người dùng vào file cá nhân
 void saveUserToFile(const User& user) {
     ofstream file(user.username + ".txt");
     if (file) {
@@ -60,7 +61,7 @@ void saveUserToFile(const User& user) {
 }
 
 
-// Function to save users to file
+// Lưu toàn bộ người dùng vào file "users.txt"
 void saveUsersToFile() {
     ofstream file("users.txt");
     for (const auto& pair : userDatabase) {
@@ -69,7 +70,7 @@ void saveUsersToFile() {
     file.close();
 }
 
-// Function to save admins to file
+// Lưu toàn bộ admin vào file "admins.txt"
 void saveAdminsToFile() {
     ofstream file("admins.txt");
     for (const auto& pair : adminDatabase) {
@@ -78,7 +79,7 @@ void saveAdminsToFile() {
     file.close();
 }
 
-// Function to load users from file
+// Tải dữ liệu người dùng từ file "users.txt" vào bộ nhớ
 void loadUsersFromFile() {
     ifstream file("users.txt");
     if (!file) return;
@@ -89,7 +90,7 @@ void loadUsersFromFile() {
     file.close();
 }
 
-// Function to load admins from file
+// Tải dữ liệu admin từ file "admins.txt" vào bộ nhớ
 void loadAdminsFromFile() {
     ifstream file("admins.txt");
     if (!file) return;
@@ -100,7 +101,7 @@ void loadAdminsFromFile() {
     file.close();
 }
 
-// Function to create a new user account
+// Hàm tạo tài khoản người dùng mới
 void createAccount() {
     string username, password;
     char choice;
@@ -114,21 +115,40 @@ void createAccount() {
     cin >> choice;
     bool isTemp = false;
     if (choice == 'y' || choice == 'Y') {
-        cout << "Enter password: ";
+        do {
+        cout << "Enter password (at least 8 characters): ";
         cin >> password;
+        if (password.length() <= 7) {
+            cout << "Password too short! Please enter at least 8 characters.\n";
+        }
+    } while (password.length() <= 7);
+
     } else {
         password = generateRandomPassword();
         isTemp = true;
-        cout << "Generated password: " << password << " (Please change it after login)" << endl;
+        cout << "Generated password: " << password << " (The password will be official after OTP cornfirmation is done and please change it after your first login)" << endl;
     }
-    User newUser = {username, simpleHash(password), 100, isTemp};
-    userDatabase[username] = newUser;
-    saveUsersToFile(); // Lưu vào danh sách tổng hợp
-    saveUserToFile(newUser); // Lưu vào file cá nhân
-    cout << "Account created successfully!" << endl;
+    
+    string otp = generateOTP();
+        cout << "Generated OTP: " << otp << " (Please enter OTP to confirm register User)" << endl;
+        string enteredOtp;
+        cin >> enteredOtp;
+        if (enteredOtp != otp) {
+            cout << "Invalid OTP! register canceled." << endl;
+            
+        }
+    else{
+        User newUser = {username, simpleHash(password), 100, isTemp};
+        userDatabase[username] = newUser;
+        saveUsersToFile(); // Lưu vào danh sách tổng hợp
+        saveUserToFile(newUser); // Lưu vào file cá nhân
+        cout << "Account created successfully!" << endl;
+        }
+    
+    
 }
 
-// Function to create a new admin account
+// Hàm tạo tài khoản Admin
 void createAdminAccount() {
     string username, password;
     cout << "Enter admin username: ";
@@ -137,8 +157,13 @@ void createAdminAccount() {
         cout << "Admin already exists!" << endl;
         return;
     }
-    cout << "Enter password: ";
-    cin >> password;
+    do {
+        cout << "Enter password (at least 8 characters): ";
+        cin >> password;
+        if (password.length() <= 7) {
+            cout << "Password too short! Please enter at least 8 characters.\n";
+        }
+    } while (password.length() <= 7);
     adminDatabase[username] = simpleHash(password);
     string otp = generateOTP();
         cout << "Generated OTP: " << otp << " (Please enter OTP to confirm register Admin)" << endl;
@@ -154,7 +179,7 @@ void createAdminAccount() {
         }
     }
     
-// Function to change acocunt information
+// Cho phép người dùng thay đổi tên đăng nhập hoặc mật khẩu
 void changeInformation(const string& username){
     int choice;
     do{
@@ -191,8 +216,13 @@ void changeInformation(const string& username){
         }
         else if (choice == 2){
             string newPassword;
-            cout << "Please enter your new password: ";
+            do {
+            cout << "Enter password (at least 8 characters): ";
             cin >> newPassword;
+            if (newPassword.length() <= 7) {
+                cout << "Password too short! Please enter at least 8 characters.\n";
+            }
+        } while (newPassword.length() <= 7);
             userDatabase[username].passwordHash = simpleHash(newPassword);
             userDatabase[username].isTempPassword = false;
             string otp = generateOTP();
@@ -213,7 +243,7 @@ void changeInformation(const string& username){
     }while (choice != 3);
 
 }
-// Function to log transactions to the user's file
+// Ghi lại nhật ký giao dịch vào file cá nhân của người dùng
 void logTransaction(const string& username, const string& message) {
     ofstream file(username + ".txt", ios::app); // Mở file ở chế độ ghi tiếp (append)
     if (file) {
@@ -225,7 +255,7 @@ void logTransaction(const string& username, const string& message) {
         cout << "Error logging transaction for " << username << "!" << endl;
     }
 }
-// Function for admin to adjust user's wallet balance
+// Admin cộng hoặc trừ điểm trong ví người dùng
 void adjustUserBalance() {
     string username;
     int amount;
@@ -282,7 +312,7 @@ void adjustUserBalance() {
     saveUsersToFile();
 }
 
-// Function to view transaction history of a user
+// Xem lịch sử giao dịch của người dùng
 void viewTransactionHistory(const string& username) {
     string filename = username + ".txt";
     ifstream file(filename);
@@ -303,7 +333,7 @@ void viewTransactionHistory(const string& username) {
 }
 
 
-// Function for user login
+// Menu thao tác sau khi đăng nhập người dùng
 void transactionMenu(const string& username) {
     int choice;
     do {
@@ -363,7 +393,7 @@ void transactionMenu(const string& username) {
     } while (choice != 5);
 }
 
-// Function to login
+// Xử lý đăng nhập người dùng
 bool loginUser() {
     string username, password;
     cout << "Enter username: ";
@@ -387,7 +417,7 @@ bool loginUser() {
         return false;
     }
 }
-// Function for admin to view all users
+// Xem các bản ghi về người dùng
 void viewUsers() {
     cout << "\nList of Users:" << endl;
     for (const auto& pair : userDatabase) {
@@ -395,7 +425,7 @@ void viewUsers() {
     }
 }
 
-// Admin function to reset user password
+// Lựa chọn thay đổi mật khẩu cho người dùng
 void resetPassword() {
     string username;
     cout << "Enter username to change information: ";
@@ -438,7 +468,7 @@ void adminMenu() {
     } while (true);
 }
 
-// Function to login as admin
+// Đăng nhập cho Admin
 bool loginAdmin() {
     string username, password;
     cout << "Enter admin username: ";
